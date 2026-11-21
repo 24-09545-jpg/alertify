@@ -115,7 +115,9 @@ def csrf_protect():
 def security_headers(resp):
     resp.headers.setdefault("X-Content-Type-Options", "nosniff")
     resp.headers.setdefault("X-Frame-Options", "SAMEORIGIN")
-    resp.headers.setdefault("Referrer-Policy", "same-origin")
+    # Send only our origin (never full URLs) to other sites. OpenStreetMap's tile
+    # servers block map requests that arrive with no Referer at all.
+    resp.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")
     # Only ask for geolocation on our own origin.
     resp.headers.setdefault("Permissions-Policy", "geolocation=(self)")
     return resp

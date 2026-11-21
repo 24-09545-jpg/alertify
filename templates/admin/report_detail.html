@@ -56,7 +56,7 @@
 <script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}"></script>
 <script>
   var map = L.map('rd-map').setView([{{ r.latitude }}, {{ r.longitude }}], 15);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+  ALERTIFY.addBaseMap(map);
   L.circleMarker([{{ r.latitude }}, {{ r.longitude }}], { radius: 10, color: '#fff', weight: 3, fillColor: '#C62828', fillOpacity: 1 }).addTo(map);
   {% if r.location_accuracy %}L.circle([{{ r.latitude }}, {{ r.longitude }}], { radius: {{ r.location_accuracy }}, color: '#C62828', weight: 1, fillOpacity: .08 }).addTo(map);{% endif %}
   {% if r.recommended_center and r.recommended_center.latitude %}

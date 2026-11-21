@@ -50,7 +50,7 @@
   var lat = document.getElementById('lat'), lng = document.getElementById('lng');
   var start = lat.value ? [parseFloat(lat.value), parseFloat(lng.value)] : {{ city_center|tojson }};
   var map = L.map('cf-map').setView(start, lat.value ? 16 : 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+  ALERTIFY.addBaseMap(map);
   var mk = lat.value ? L.marker(start).addTo(map) : null;
   function set(ll) { lat.value = ll.lat.toFixed(6); lng.value = ll.lng.toFixed(6); if (mk) mk.setLatLng(ll); else mk = L.marker(ll).addTo(map); }
   map.on('click', function (e) { set(e.latlng); });

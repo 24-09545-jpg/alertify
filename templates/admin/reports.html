@@ -28,7 +28,7 @@
 (function () {
   var pins = {{ pins|tojson }}, c = {{ city_center|tojson }};
   var map = L.map('rep-map').setView(c, 12);
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+  ALERTIFY.addBaseMap(map);
   var colors = { low: '#16A34A', moderate: '#F59E0B', high: '#EA580C', critical: '#B71C1C' };
   var pts = [];
   pins.forEach(function (p) {

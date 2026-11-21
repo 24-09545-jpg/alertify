@@ -10,9 +10,7 @@
   var map = null, userMarker = null, accCircle = null, pinMode = false;
   if (window.L) {
     map = L.map('mini-map', { zoomControl: true, attributionControl: true }).setView(cfg.center, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19, attribution: '© OpenStreetMap contributors'
-    }).addTo(map);
+    ALERTIFY.addBaseMap(map);
     var b = cfg.bounds;
     L.rectangle([[b.min_lat, b.min_lng], [b.max_lat, b.max_lng]], {
       color: '#C62828', weight: 1, dashArray: '4 6', fill: false, interactive: false

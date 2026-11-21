@@ -110,6 +110,16 @@
       .catch(function () {});
   }
 
+  // --- base map shared by every Leaflet map in the app (one place to change it).
+  // OpenStreetMap's tile servers require a Referer header; app.py sends the site
+  // origin via "Referrer-Policy: strict-origin-when-cross-origin" so tiles load.
+  ALERTIFY.addBaseMap = function (map) {
+    return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+  };
+
   // --- service worker
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     window.addEventListener('load', function () { navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function () {}); });

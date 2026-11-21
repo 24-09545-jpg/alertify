@@ -10,7 +10,7 @@
   var map = null, layer = null, userMarker = null;
   if (window.L) {
     map = L.map('evac-map').setView(cfg.center, 12);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
+    ALERTIFY.addBaseMap(map);
     layer = L.featureGroup().addTo(map);
   } else {
     $('evac-map').innerHTML = '<p class="map-fallback">The map could not load (you may be offline). The list still works.</p>';
