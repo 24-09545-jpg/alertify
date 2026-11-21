@@ -17,6 +17,19 @@ On first start the database is created and seeded at `instance/alertify.db`, and
 
 More admins: `flask --app app create-admin`, or promote a user under **Admin → User Management**.
 
+## Sharing the database between computers
+
+`database/alertify.db` is a shared copy of the app's database (accounts, reports, admin changes).
+On a computer that has no `instance/alertify.db` yet, the app copies it in automatically on first
+run, so the same accounts work everywhere.
+
+* **Send your latest data:** run `python share_database.py`, then commit and push `database/alertify.db`.
+* **Receive it on another computer:** download the project, delete `instance/alertify.db` if it exists, and run `python app.py`.
+
+Each computer then keeps its own copy, and changes are not synced live. Repeat the steps above to share again.
+The repository is public: passwords are stored only as hashes, but names, emails and reports in
+the shared database can be downloaded by anyone.
+
 ## Configuration (environment variables)
 
 | Variable | Purpose |

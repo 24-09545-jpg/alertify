@@ -32,6 +32,24 @@ from models import (AdminAccount, DisasterCategory, DisasterInstruction, Disaste
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
 os.makedirs(INSTANCE_DIR, exist_ok=True)
+LOCAL_DB = os.path.join(INSTANCE_DIR, "alertify.db")
+SHARED_DB = os.path.join(BASE_DIR, "database", "alertify.db")  # snapshot kept in GitHub
+
+
+def use_shared_database():
+    """First run on a new computer: start from the shared snapshot in database/.
+
+    This brings the same accounts, reports and admin changes to every copy.
+    An existing local database is never overwritten.
+    """
+    if os.environ.get("DATABASE_URL") or os.path.exists(LOCAL_DB) or not os.path.exists(SHARED_DB):
+        return
+    import shutil
+    shutil.copyfile(SHARED_DB, LOCAL_DB)
+    print(f"[ALERTIFY] Started from the shared database: {SHARED_DB}", flush=True)
+
+
+use_shared_database()
 PH_OFFSET = timedelta(hours=8)  # Asia/Manila, no DST
 
 REPORT_STATUSES = ["active", "acknowledged", "responding", "resolved", "closed"]
@@ -60,7 +78,7 @@ app = Flask(__name__, instance_path=INSTANCE_DIR)
 app.config.update(
     SECRET_KEY=_secret_key(),
     SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL")
-    or "sqlite:///" + os.path.join(INSTANCE_DIR, "alertify.db"),
+    or "sqlite:///" + LOCAL_DB,
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
