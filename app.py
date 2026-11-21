@@ -1232,5 +1232,26 @@ def create_admin_cmd():
 with app.app_context():
     seed_database()
 
+def port_in_use(host, port):
+    """True if something is already listening on host:port."""
+    import socket
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.settimeout(0.5)
+        return s.connect_ex((host, port)) == 0
+
+
 if __name__ == "__main__":
-    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", host="127.0.0.1", port=int(os.environ.get("PORT", 5000)))
+    HOST, PORT = "127.0.0.1", int(os.environ.get("PORT", 5000))
+    # On Windows a second server can bind the same port without an error. Requests
+    # then bounce between two copies (often from different folders, each with its
+    # own database and secret key), so logins fail and form data is lost.
+    # WERKZEUG_RUN_MAIN is set inside the debug reloader's child, which must start.
+    if not os.environ.get("WERKZEUG_RUN_MAIN") and port_in_use(HOST, PORT):
+        raise SystemExit(f"ALERTIFY is already running at http://{HOST}:{PORT}\n"
+                         "Close the other ALERTIFY window/terminal first (Ctrl+C), then run this again.")
+    print(f" * ALERTIFY folder:   {BASE_DIR}")
+    print(f" * Database:          {app.config['SQLALCHEMY_DATABASE_URI']}")
+    creds = os.path.join(INSTANCE_DIR, "ADMIN_CREDENTIALS.txt")
+    if os.path.exists(creds):
+        print(f" * Admin login file:  {creds}")
+    app.run(debug=os.environ.get("FLASK_DEBUG") == "1", host=HOST, port=PORT)
