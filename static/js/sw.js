@@ -1,5 +1,5 @@
 /* ALERTIFY service worker — offline access to emergency info */
-var VERSION = 'alertify-v5';
+var VERSION = 'alertify-v7';
 var SHELL = [
   '/', '/contacts', '/guide', '/offline', '/about',
   '/static/css/style.css', '/static/js/app.js', '/static/js/contacts.js', '/static/img/logo.svg',

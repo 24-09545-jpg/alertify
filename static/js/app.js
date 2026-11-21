@@ -149,6 +149,11 @@
   // OpenStreetMap's tile servers require a Referer header; app.py sends the site
   // origin via "Referrer-Policy: strict-origin-when-cross-origin" so tiles load.
   ALERTIFY.addBaseMap = function (map) {
+    // Redraw when the map's box changes size (phone rotation, layout shifts, fonts
+    // loading); otherwise Leaflet leaves grey, tile-less strips at the edges.
+    if ('ResizeObserver' in window) {
+      new ResizeObserver(function () { map.invalidateSize(); }).observe(map.getContainer());
+    }
     return L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
