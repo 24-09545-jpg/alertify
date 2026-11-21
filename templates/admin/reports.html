@@ -1,6 +1,6 @@
 {% extends "admin/layout.html" %}
 {% block title %}Disaster Reports{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.css') }}">{% endblock %}
 {% block page_title %}Disaster Reports{% endblock %}
 {% block page_sub %}<p>{{ reports|length }} report{{ 's' if reports|length != 1 }} shown{% if reports|length == 300 %} (latest 300 — refine filters){% endif %}</p>{% endblock %}
 {% block actions %}<a class="btn btn-dark" href="{{ url_for('admin_reports_export', **args) }}">{{ icon('download') }} Export CSV</a>{% endblock %}
@@ -23,7 +23,7 @@
 <section class="card">{% include "admin/_report_table.html" with context %}</section>
 {% endblock %}
 {% block scripts %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}"></script>
 <script>
 (function () {
   var pins = {{ pins|tojson }}, c = {{ city_center|tojson }};

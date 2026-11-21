@@ -1,8 +1,9 @@
 /* ALERTIFY service worker — offline access to emergency info */
-var VERSION = 'alertify-v2';
+var VERSION = 'alertify-v3';
 var SHELL = [
   '/', '/contacts', '/guide', '/offline', '/about',
-  '/static/css/style.css', '/static/js/app.js', '/static/js/contacts.js', '/static/img/logo.svg'
+  '/static/css/style.css', '/static/js/app.js', '/static/js/contacts.js', '/static/img/logo.svg',
+  '/static/vendor/leaflet-1.9.4/leaflet.css', '/static/vendor/leaflet-1.9.4/leaflet.js'
 ];
 // Pages that are safe to keep for offline reading (no other users' data).
 var CACHEABLE = [/^\/$/, /^\/contacts$/, /^\/guide(\/[a-z]+)?$/, /^\/about$/, /^\/offline$/,

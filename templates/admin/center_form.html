@@ -1,6 +1,6 @@
 {% extends "admin/layout.html" %}
 {% block title %}{{ 'Edit' if c.id else 'Add' }} Evacuation Center{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.css') }}">{% endblock %}
 {% block page_title %}{{ 'Edit evacuation center' if c.id else 'Add evacuation center' }}{% endblock %}
 {% block page_sub %}<p><a class="link" href="{{ url_for('admin_centers') }}">← All centers</a></p>{% endblock %}
 {% block content %}
@@ -44,7 +44,7 @@
 </form>
 {% endblock %}
 {% block scripts %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}"></script>
 <script>
 (function () {
   var lat = document.getElementById('lat'), lng = document.getElementById('lng');

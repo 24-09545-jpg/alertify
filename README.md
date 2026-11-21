@@ -37,6 +37,10 @@ For production, run behind a WSGI server over HTTPS (e.g. `waitress-serve --port
 | `engine.py` | Per-disaster questions, condition flags, severity scoring, instruction selection, nearest-center search |
 | `seed_data.py` | Initial data: 80 Batangas City evacuation centers from `EVACUATION-CENTER-2-1.pdf`, contacts, guidance, 105 barangays |
 | `templates/`, `static/` | Jinja pages, CSS, JS (Leaflet maps, Chart.js), offline service worker |
+| `static/vendor/leaflet-1.9.4/` | Local copy of the Leaflet map library, so the map code loads without internet (map tiles still need a connection) |
+| `data/` | The dataset as CSV, JSON and GeoJSON (evacuation centers on a map), see [data/README.md](data/README.md) |
+| `export_data.py` | Regenerates `data/` from `seed_data.py`: `python export_data.py` |
+| `start_alertify.bat` | Windows: double-click to start the app and open the browser |
 
 ## Data and safety notes
 

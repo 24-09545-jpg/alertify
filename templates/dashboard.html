@@ -1,7 +1,7 @@
 {% extends "app_layout.html" %}
 {% import "_macros.html" as m with context %}
 {% block title %}Dashboard{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.css') }}">{% endblock %}
 {% block page_title %}{% if current_user.is_authenticated %}Hello, {{ current_user.full_name.split()[0] }}{% else %}Emergency Dashboard{% endif %}{% endblock %}
 {% block page_sub %}<p>Report your situation and get guidance for Batangas City.</p>{% endblock %}
 {% block content %}
@@ -160,7 +160,7 @@
 </div>
 {% endblock %}
 {% block scripts %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}"></script>
 <script>
   window.ALERTIFY_DASH = {
     questions: {{ questions|tojson }},

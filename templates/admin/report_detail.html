@@ -1,7 +1,7 @@
 {% extends "admin/layout.html" %}
 {% import "_macros.html" as m with context %}
 {% block title %}Report {{ r.reference }}{% endblock %}
-{% block head %}<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">{% endblock %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.css') }}">{% endblock %}
 {% block page_title %}Report {{ r.reference }}{% endblock %}
 {% block page_sub %}<p><a class="link" href="{{ url_for('admin_reports') }}">← All reports</a></p>{% endblock %}
 {% block content %}
@@ -53,7 +53,7 @@
 {% endblock %}
 {% block scripts %}
 {% if r.latitude is not none %}
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{{ url_for('static', filename='vendor/leaflet-1.9.4/leaflet.js') }}"></script>
 <script>
   var map = L.map('rd-map').setView([{{ r.latitude }}, {{ r.longitude }}], 15);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap contributors' }).addTo(map);
