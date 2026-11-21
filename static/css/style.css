@@ -784,6 +784,9 @@ body.landing { background: #0B1118; }
   .alertify-title::after { display: none; }
 }
 
+/* ------------------------------------------------- deployment setup warning (Vercel) */
+.setup-warning { position: relative; z-index: 100; background: #FEF3C7; color: #713F12; border-bottom: 1px solid #FDE68A; padding: 10px 16px; font-size: .88rem; font-weight: 600; text-align: center; }
+
 /* ------------------------------------------------- show / hide password button */
 .pw-wrap { position: relative; display: block; }
 .pw-wrap input { padding-right: 46px; }

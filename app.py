@@ -245,7 +245,21 @@ def inject_globals():
         "nav_notifications": notes,
         "nav_unread": unread_ids(notes),
         "severity_labels": engine.SEVERITY_LABELS,
+        "setup_warning": setup_warning(),
     }
+
+
+def setup_warning():
+    """A message for the warning bar when the Vercel deployment is missing settings."""
+    if not ON_VERCEL:
+        return None
+    if not os.environ.get("SECRET_KEY"):
+        return ("Setup needed: add SECRET_KEY in Vercel > Settings > Environment Variables, then redeploy. "
+                "Until then you may be logged out between pages.")
+    if not database_url() and current_user.is_authenticated and current_user.is_admin:
+        return ("No online database is connected, so new accounts, reports and changes are lost when "
+                "Vercel restarts. Connect a Postgres database in Vercel > Storage, then redeploy.")
+    return None
 
 
 def send_email(to, subject, body):
@@ -1206,8 +1220,44 @@ def e404(_):
 
 
 # ------------------------------------------------------------------ seeding
+def import_shared_snapshot():
+    """Empty external database (e.g. Postgres on Vercel): copy in database/alertify.db.
+
+    This gives a new online database the same accounts, reports and admin
+    changes as the shared snapshot, so the usual logins work right away.
+    Runs only once: it does nothing if the database already has users.
+    """
+    if not database_url() or not os.path.exists(SHARED_DB) or User.query.first():
+        return
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.exc import IntegrityError
+    source = create_engine("sqlite:///" + SHARED_DB)
+    try:
+        with source.connect() as src:
+            for table in db.metadata.sorted_tables:          # parents before children
+                rows = [dict(r._mapping) for r in src.execute(table.select())]
+                if rows:
+                    db.session.execute(table.insert(), rows)
+        db.session.commit()
+    except IntegrityError:
+        db.session.rollback()   # another server imported it at the same moment
+        return
+    finally:
+        source.dispose()
+    if db.engine.dialect.name == "postgresql":
+        # Copied rows keep their ids; move each id counter past them.
+        for table in db.metadata.sorted_tables:
+            if "id" in table.c:
+                db.session.execute(text(
+                    f"SELECT setval(pg_get_serial_sequence('{table.name}', 'id'), "
+                    f"COALESCE((SELECT MAX(id) FROM {table.name}), 1))"))
+        db.session.commit()
+    print("[ALERTIFY] Imported accounts and data from the shared database.", flush=True)
+
+
 def seed_database():
     db.create_all()
+    import_shared_snapshot()
     if not DisasterCategory.query.first():
         for i, (code, name, icon, desc) in enumerate(seed_data.CATEGORIES):
             db.session.add(DisasterCategory(code=code, name=name, icon=icon, description=desc, sort_order=i))

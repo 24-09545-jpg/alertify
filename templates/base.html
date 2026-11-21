@@ -16,6 +16,7 @@
 </head>
 <body class="{% block body_class %}{% endblock %}">
   <a href="#main" class="skip-link">Skip to content</a>
+  {% if setup_warning %}<div class="setup-warning" role="alert">{{ setup_warning }}</div>{% endif %}
   {% block body %}{% endblock %}
   <div id="toast-root" aria-live="polite"></div>
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
