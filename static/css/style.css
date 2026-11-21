@@ -770,6 +770,14 @@ body.landing { background: #0B1118; }
   .alertify-title::after { display: none; }
 }
 
+/* ------------------------------------------------- show / hide password button */
+.pw-wrap { position: relative; display: block; }
+.pw-wrap input { padding-right: 46px; }
+.pw-toggle { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 8px; background: none; color: var(--muted); cursor: pointer; }
+.pw-toggle:hover { color: var(--ink); background: #F1F5F9; }
+.pw-toggle:focus-visible { outline: 3px solid rgba(239, 68, 68, .55); outline-offset: 1px; }
+.pw-toggle[aria-pressed="true"] { color: var(--red); }
+
 /* ------------------------------------------------- landing "Log in or later?" popup */
 .start-modal { width: min(420px, calc(100vw - 32px)); border: 0; border-radius: 20px; padding: 28px 24px 22px; text-align: center; box-shadow: var(--shadow-lg); color: var(--ink); background: #fff; }
 .start-modal::backdrop { background: rgba(11, 17, 24, .7); }
