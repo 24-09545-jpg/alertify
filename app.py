@@ -30,10 +30,31 @@ from models import (AdminAccount, DisasterCategory, DisasterInstruction, Disaste
                     ReportHistory, User, db, utcnow)
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
-INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
+# Vercel runs the app as a serverless function: the project folder is read-only and
+# only the temp folder (/tmp) is writable, and it is wiped between cold starts.
+ON_VERCEL = bool(os.environ.get("VERCEL"))
+if ON_VERCEL:
+    import tempfile
+    INSTANCE_DIR = os.path.join(tempfile.gettempdir(), "alertify-instance")
+else:
+    INSTANCE_DIR = os.path.join(BASE_DIR, "instance")
 os.makedirs(INSTANCE_DIR, exist_ok=True)
 LOCAL_DB = os.path.join(INSTANCE_DIR, "alertify.db")
 SHARED_DB = os.path.join(BASE_DIR, "database", "alertify.db")  # snapshot kept in GitHub
+
+
+def database_url():
+    """External database URL, if one is configured (e.g. Postgres on Vercel/Neon).
+
+    Vercel's Postgres integrations set POSTGRES_URL or DATABASE_URL as
+    "postgres://..." or "postgresql://..."; SQLAlchemy needs the driver named.
+    """
+    url = os.environ.get("DATABASE_URL") or os.environ.get("POSTGRES_URL") or ""
+    if url.startswith("postgres://"):
+        url = "postgresql://" + url[len("postgres://"):]
+    if url.startswith("postgresql://"):
+        url = "postgresql+psycopg://" + url[len("postgresql://"):]
+    return url or None
 
 
 def use_shared_database():
@@ -42,7 +63,7 @@ def use_shared_database():
     This brings the same accounts, reports and admin changes to every copy.
     An existing local database is never overwritten.
     """
-    if os.environ.get("DATABASE_URL") or os.path.exists(LOCAL_DB) or not os.path.exists(SHARED_DB):
+    if database_url() or os.path.exists(LOCAL_DB) or not os.path.exists(SHARED_DB):
         return
     import shutil
     shutil.copyfile(SHARED_DB, LOCAL_DB)
@@ -66,6 +87,10 @@ EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 def _secret_key():
     if os.environ.get("SECRET_KEY"):
         return os.environ["SECRET_KEY"]
+    if ON_VERCEL:
+        # Each serverless instance would make its own key, so logins and forms would
+        # randomly fail. Set SECRET_KEY in Vercel > Settings > Environment Variables.
+        print("[ALERTIFY] WARNING: SECRET_KEY is not set on Vercel; logins may fail.", flush=True)
     path = os.path.join(INSTANCE_DIR, "secret_key")
     if not os.path.exists(path):
         with open(path, "w") as fh:
@@ -77,9 +102,12 @@ def _secret_key():
 app = Flask(__name__, instance_path=INSTANCE_DIR)
 app.config.update(
     SECRET_KEY=_secret_key(),
-    SQLALCHEMY_DATABASE_URI=os.environ.get("DATABASE_URL")
-    or "sqlite:///" + LOCAL_DB,
+    SQLALCHEMY_DATABASE_URI=database_url() or "sqlite:///" + LOCAL_DB,
+    # Serverless Postgres closes idle connections; check each one before use.
+    SQLALCHEMY_ENGINE_OPTIONS={"pool_pre_ping": True},
     SQLALCHEMY_TRACK_MODIFICATIONS=False,
+    SESSION_COOKIE_SECURE=ON_VERCEL,  # Vercel always serves over HTTPS
+    REMEMBER_COOKIE_SECURE=ON_VERCEL,
     SESSION_COOKIE_HTTPONLY=True,
     SESSION_COOKIE_SAMESITE="Lax",
     PERMANENT_SESSION_LIFETIME=timedelta(days=30),
@@ -1268,7 +1296,9 @@ if __name__ == "__main__":
         raise SystemExit(f"ALERTIFY is already running at http://{HOST}:{PORT}\n"
                          "Close the other ALERTIFY window/terminal first (Ctrl+C), then run this again.")
     print(f" * ALERTIFY folder:   {BASE_DIR}")
-    print(f" * Database:          {app.config['SQLALCHEMY_DATABASE_URI']}")
+    from sqlalchemy.engine import make_url
+    url = make_url(app.config["SQLALCHEMY_DATABASE_URI"])
+    print(f" * Database:          {url.database if url.drivername == 'sqlite' else url.render_as_string(hide_password=True)}")
     creds = os.path.join(INSTANCE_DIR, "ADMIN_CREDENTIALS.txt")
     if os.path.exists(creds):
         print(f" * Admin login file:  {creds}")

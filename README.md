@@ -17,6 +17,21 @@ On first start the database is created and seeded at `instance/alertify.db`, and
 
 More admins: `flask --app app create-admin`, or promote a user under **Admin → User Management**.
 
+## Deploy to Vercel
+
+The app is ready for Vercel's Flask support (`app.py` exposes `app`); no extra config is needed.
+
+1. On vercel.com: **Add New → Project → Import** this GitHub repository, then **Deploy**.
+   Every `git push` to `main` then deploys automatically.
+2. **Settings → Environment Variables**, add, then **Redeploy**:
+   * `SECRET_KEY`: any long random text (keeps logins working across Vercel's servers). Required.
+   * Optional, to keep new data: a Postgres database (Vercel **Storage → Create → Neon/Postgres**,
+     connected to the project). It sets `DATABASE_URL`/`POSTGRES_URL` automatically. With it, also set
+     `ALERTIFY_ADMIN_PASSWORD` before the first deploy so you know the admin password.
+
+Without Postgres, each Vercel server starts from `database/alertify.db` (same accounts as the shared
+database), but new sign-ups, reports and admin changes are lost when Vercel restarts the server.
+
 ## Sharing the database between computers
 
 `database/alertify.db` is a shared copy of the app's database (accounts, reports, admin changes).
